@@ -8,7 +8,8 @@ export default function WelcomeScreen({ navigation }) {
     <View style={styles.wrap}>
       <Text style={[fonts.h1, styles.h1]}>Regina FoodBank</Text>
       <Text style={styles.p}>Register to access local hampers, hours, and donation pickup slots.</Text>
-      <PrimaryButton title="Get Started" onPress={() => navigation.navigate('RegisterFlow')} />
+      <PrimaryButton title="I'm a Recipient" onPress={() => navigation.navigate('RegisterFlow')} />
+      <PrimaryButton title="I'm a Donor" onPress={() => navigation.navigate('Donor')} />
     </View>
   );
 }
