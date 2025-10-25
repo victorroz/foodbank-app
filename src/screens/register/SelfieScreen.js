@@ -9,7 +9,7 @@ export default function SelfieScreen({ navigation }) {
   const { data, setField } = useRegistrationStore();
 
   const takeSelfie = async () => {
-    const res = await ImagePicker.launchCameraAsync({ quality: 0.7, cameraType: 'front' });
+    const res = await ImagePicker.launchCameraAsync({ quality: 0.7, cameraType: ImagePicker.CameraType.front });
     if (!res.canceled) setField('selfieUri', res.assets[0].uri);
   };
 

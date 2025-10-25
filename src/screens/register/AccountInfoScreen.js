@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import { Formik } from 'formik';
 import FormTextInput from '../../components/FormTextInput';
 import PrimaryButton from '../../components/PrimaryButton';
@@ -19,15 +19,21 @@ export default function AccountInfoScreen({ navigation }) {
           dob: data.dob, householdSize: String(data.householdSize || '')
         }}
         validationSchema={accountSchema}
-        onSubmit={async (values) => {
-          Object.entries(values).forEach(([k, v]) => setField(k, v));
-          const res = await registerStep1({ ...values, householdSize: Number(values.householdSize), role: 'recipient' });
-          setField('userId', res.data.userId);
-          await sendOtp({ phone: values.phone });
-          navigation.navigate('VerifyContact');
+        onSubmit={async (values, { setSubmitting }) => {
+          try {
+            Object.entries(values).forEach(([k, v]) => setField(k, v));
+            const res = await registerStep1({ ...values, householdSize: Number(values.householdSize), role: 'recipient' });
+            setField('userId', res.data.userId);
+            await sendOtp({ phone: values.phone });
+            navigation.navigate('VerifyContact');
+          } catch (e) {
+            Alert.alert('Registration failed', 'Please check your details and try again.');
+          } finally {
+            setSubmitting(false);
+          }
         }}
       >
-        {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isValid }) => (
+        {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isValid, isSubmitting }) => (
           <>
             <FormTextInput label="First Name" value={values.firstName} onChangeText={handleChange('firstName')} onBlur={handleBlur('firstName')} error={touched.firstName && errors.firstName} />
             <FormTextInput label="Last Name" value={values.lastName} onChangeText={handleChange('lastName')} onBlur={handleBlur('lastName')} error={touched.lastName && errors.lastName} />
@@ -36,7 +42,7 @@ export default function AccountInfoScreen({ navigation }) {
             <FormTextInput label="Password" secureTextEntry value={values.password} onChangeText={handleChange('password')} onBlur={handleBlur('password')} error={touched.password && errors.password} />
             <FormTextInput label="Date of Birth (YYYY-MM-DD)" value={values.dob} onChangeText={handleChange('dob')} onBlur={handleBlur('dob')} error={touched.dob && errors.dob} />
             <FormTextInput label="Household Size" keyboardType="number-pad" value={values.householdSize} onChangeText={handleChange('householdSize')} onBlur={handleBlur('householdSize')} error={touched.householdSize && errors.householdSize} />
-            <PrimaryButton title="Continue" onPress={handleSubmit} disabled={Boolean(!isValid)} />
+            <PrimaryButton title={isSubmitting ? 'Please wait...' : 'Continue'} onPress={handleSubmit} disabled={Boolean(!isValid || isSubmitting)} />
           </>
         )}
       </Formik>
