@@ -9,17 +9,19 @@ const toBool = (v) => v === true || v === 'true' || v === 1 || v === '1';
 
 export default function ConsentScreen({ navigation }) {
   const { data, setField } = useRegistrationStore();
-  const [consentData, setConsentData] = React.useState(toBool(data.consentData));
-  const [consentMarketing, setConsentMarketing] = React.useState(toBool(data.consentMarketing));
+  const [consentData, setConsentData] = useState(toBool(data.consentData));
+  const [consentMarketing, setConsentMarketing] = useState(toBool(data.consentMarketing));
 
 
 
   const onNext = () => {
-    const requiredConsent = normalizeBoolean(consentData);
-    const marketingConsent = normalizeBoolean(consentMarketing);
-    setField('consentData', Boolean(consentData));
+    const requiredConsent = Boolean(consentData);
+    setField('consentData', requiredConsent);
     setField('consentMarketing', Boolean(consentMarketing));
-    if (!requiredConsent) return Alert.alert('Please accept the Data Consent to continue.');
+    if (!requiredConsent) {
+      Alert.alert('Please accept the Data Consent to continue.');
+      return;
+    }
     navigation.navigate('ReviewSubmit');
   };
 
