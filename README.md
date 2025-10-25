@@ -40,19 +40,26 @@ The backend (developed separately by the API team) handles verification, city-on
 
 ## 🗂 Folder Structure
 
-foodbank-app/
-├── assets/ # Icons, splash images
-├── src/
-│ ├── components/ # Shared UI (Button, Input, Toast, etc.)
-│ ├── navigation/ # AppNavigator.js
-│ ├── screens/
-│ │ ├── WelcomeScreen.js
-│ │ ├── DashboardScreen.js
-│ │ └── register/ # Multi-step registration screens
-│ ├── store/ # Zustand global store
-│ ├── utils/ # API mocks, contracts, validation
-│ └── theme.js # Colors, typography, spacing
-├── App.js # Root app entry
-├── app.json # Expo config + permissions
-├── package.json
-└── README.md
+- **`foodbank-app/`**
+  - **`assets/`** — Icons, logos, splash images, and static assets
+  - **`src/`**
+    - **`components/`** — Reusable UI components (e.g., `Button`, `Input`, `Toast`)
+    - **`navigation/`** — Navigation stack and routing setup (`AppNavigator.js`)
+    - **`screens/`**
+      - **`WelcomeScreen.js`** — Entry screen with app intro and “Get Started”
+      - **`DashboardScreen.js`** — Post-registration landing screen
+      - **`register/`** — Multi-step registration flow
+        - `AccountInfoScreen.js`
+        - `VerifyContactScreen.js`
+        - `GovIdScreen.js`
+        - `SelfieScreen.js`
+        - `AddressScreen.js`
+        - `ConsentScreen.js`
+        - `ReviewSubmitScreen.js`
+    - **`store/`** — Zustand global state store (for registration data)
+    - **`utils/`** — Utility functions, API mocks, and validation logic
+    - **`theme.js`** — Centralized styling tokens (colors, fonts, spacing)
+  - **`App.js`** — Root application entry
+  - **`app.json`** — Expo configuration & permissions
+  - **`package.json`** — NPM dependencies and scripts
+  - **`README.md`** — Project documentation
