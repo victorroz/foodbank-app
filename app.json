@@ -15,7 +15,7 @@
         "NSLocationWhenInUseUsageDescription": "We use your location to autofill city and validate local eligibility."
       }
     },
-    "android": { "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "ACCESS_FINE_LOCATION"] },
+    "android": { "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"] },
     "extra": {
       "API_BASE_URL": "http://localhost:4000",
       "MOCK_MODE": true
