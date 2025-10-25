@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, StyleSheet, Text, Alert } from 'react-native';
+import { View, StyleSheet, Text, Alert, Platform } from 'react-native';
 import * as Location from 'expo-location';
 import Constants from 'expo-constants';
 import { Formik } from 'formik';
@@ -22,19 +22,63 @@ export default function AddressScreen({ navigation }) {
     countryIso: Constants.expoConfig?.extra?.SERVICE_COUNTRY_ISO || 'CA'
   }), []);
 
+  const withTimeout = async (promise, ms) => {
+    let timeoutId;
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutId = setTimeout(() => reject(new Error('timeout')), ms);
+    });
+    try {
+      const result = await Promise.race([promise, timeoutPromise]);
+      return result;
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  };
+
   const useMyLocation = async (onFormChange) => {
     try {
       setLocating(true);
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Location required', 'Please allow location access to continue.');
+        Alert.alert('Permission needed', 'Please allow location access to continue. You can enable it in Settings.');
         setLocationOk(false);
         return;
       }
-      const position = await Location.getCurrentPositionAsync({ accuracy: Location.LocationAccuracy.Balanced });
+
+      const servicesEnabled = await Location.hasServicesEnabledAsync();
+      if (!servicesEnabled) {
+        Alert.alert(
+          'Location services off',
+          Platform.select({
+            ios: 'Enable Location Services in Settings > Privacy & Security > Location Services.',
+            android: 'Turn on Location services (GPS) in Settings to continue.'
+          })
+        );
+        setLocationOk(false);
+        return;
+      }
+
+      // Quick win: try last known first
+      let position = await Location.getLastKnownPositionAsync();
+      if (!position) {
+        // Fallback to an active fix with a timeout to avoid hanging
+        position = await withTimeout(
+          Location.getCurrentPositionAsync({
+            accuracy: Location.LocationAccuracy.Balanced,
+            mayShowUserSettingsDialog: true
+          }),
+          10000
+        );
+      }
       const { latitude, longitude } = position.coords;
       setCoords({ latitude, longitude });
-      const places = await Location.reverseGeocodeAsync({ latitude, longitude });
+      let places = [];
+      try {
+        places = await withTimeout(Location.reverseGeocodeAsync({ latitude, longitude }), 8000);
+      } catch (geoErr) {
+        // If reverse geocoding fails, keep coords but inform user to fill address
+        Alert.alert('Address lookup failed', 'We found your location but could not auto-fill the address. Please enter it manually.');
+      }
       const place = places?.[0];
       const iso = place?.isoCountryCode;
       const city = place?.city || place?.subregion || '';
@@ -46,7 +90,7 @@ export default function AddressScreen({ navigation }) {
       const inCity = city?.toLowerCase() === serviceRules.city.toLowerCase();
       const inRegion = region?.toLowerCase() === serviceRules.region.toLowerCase();
 
-      if (!inCountry || !inCity || !inRegion) {
+      if (place && (!inCountry || !inCity || !inRegion)) {
         setLocationOk(false);
         Alert.alert('Out of service area', `This app currently serves ${serviceRules.city}, ${serviceRules.region}, ${serviceRules.countryIso} only.`);
       } else {
@@ -64,7 +108,11 @@ export default function AddressScreen({ navigation }) {
       setField('postalCode', postalCode);
     } catch (e) {
       setLocationOk(false);
-      Alert.alert('Location error', 'Unable to get your location. Try again.');
+      if (e?.message === 'timeout') {
+        Alert.alert('Timed out', 'Getting your location took too long. Try again near a window or outdoors.');
+      } else {
+        Alert.alert('Location error', 'Unable to get your location. Please try again.');
+      }
     } finally {
       setLocating(false);
     }
