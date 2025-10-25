@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import WelcomeScreen from '../screens/WelcomeScreen';
 import DashboardScreen from '../screens/DashboardScreen';
+import DonorScreen from '../screens/DonorScreen';
 
 import AccountInfoScreen from '../screens/register/AccountInfoScreen';
 import VerifyContactScreen from '../screens/register/VerifyContactScreen';
@@ -33,6 +34,7 @@ export default function AppNavigator() {
   return (
     <Root.Navigator>
       <Root.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
+      <Root.Screen name="Donor" component={DonorScreen} options={{ title: 'Donate' }} />
       <Root.Screen name="RegisterFlow" component={RegisterNavigator} options={{ headerShown: false }} />
       <Root.Screen name="Dashboard" component={DashboardScreen} options={{ title: 'Home' }} />
     </Root.Navigator>
