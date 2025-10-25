@@ -5,7 +5,16 @@ import StepProgressBar from '../../components/StepProgressBar';
 import useRegistrationStore from '../../store/registrationStore';
 import { fonts } from '../../theme';
 
-const toBool = (v) => v === true || v === 'true' || v === 1 || v === '1';
+const toBool = (v) => {
+  if (v === true || v === false) return v;
+  if (typeof v === 'string') {
+    const s = v.trim().toLowerCase();
+    if (s === 'true' || s === '1' || s === 'yes' || s === 'y') return true;
+    if (s === 'false' || s === '0' || s === 'no' || s === 'n') return false;
+  }
+  if (typeof v === 'number') return v !== 0;
+  return Boolean(v);
+};
 
 export default function ConsentScreen({ navigation }) {
   const { data, setField } = useRegistrationStore();
