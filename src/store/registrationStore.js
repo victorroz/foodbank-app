@@ -12,8 +12,20 @@ const initial = {
 
 const BOOLEAN_FIELDS = new Set(['consentMarketing', 'consentData']);
 
+// Normalize potentially string/number inputs to strict booleans for known boolean fields
+const toBoolean = (value) => {
+  if (value === true || value === false) return value;
+  if (typeof value === 'string') {
+    const v = value.trim().toLowerCase();
+    if (v === 'true' || v === '1' || v === 'yes' || v === 'y') return true;
+    if (v === 'false' || v === '0' || v === 'no' || v === 'n') return false;
+  }
+  if (typeof value === 'number') return value !== 0;
+  return Boolean(value);
+};
+
 const normalizeValue = (key, value) => (
-  BOOLEAN_FIELDS.has(key) ? (value === true) : value
+  BOOLEAN_FIELDS.has(key) ? toBoolean(value) : value
 );
 
 const useRegistrationStore = create((set) => ({
