@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 export default function LoadingOverlay({ visible }) {
-  if (!visible) return null;
+  const isVisible = visible === true || visible === 'true';
+  if (!isVisible) return null;
   return (
     <View style={styles.backdrop}>
       <ActivityIndicator size="large" />

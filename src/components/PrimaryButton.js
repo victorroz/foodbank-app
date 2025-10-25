@@ -1,9 +1,11 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { colors } from '../theme';
+
 export default function PrimaryButton({ title, onPress, disabled }) {
+  const isDisabled = disabled === true || disabled === 'true';
   return (
-    <TouchableOpacity style={[styles.btn, disabled && styles.disabled]} onPress={onPress} disabled={disabled}>
+    <TouchableOpacity style={[styles.btn, isDisabled && styles.disabled]} onPress={onPress} disabled={isDisabled}>
       <Text style={styles.txt}>{title}</Text>
     </TouchableOpacity>
   );
