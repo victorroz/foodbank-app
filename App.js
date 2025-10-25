@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet } from 'react-native';
@@ -9,8 +9,11 @@ export const useToast = () => useContext(ToastCtx);
 
 function ToastHost({ children }) {
   const [msg, setMsg] = useState('');
-  const show = (m) => { setMsg(m); setTimeout(() => setMsg(''), 1800); };
-  const value = useMemo(() => ({ show }), []);
+  const show = useCallback((m) => {
+    setMsg(m);
+    setTimeout(() => setMsg(''), 1800);
+  }, []);
+  const value = useMemo(() => ({ show }), [show]);
   return (
     <ToastCtx.Provider value={value}>
       {children}
