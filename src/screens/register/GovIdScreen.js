@@ -9,7 +9,7 @@ export default function GovIdScreen({ navigation }) {
   const { data, setField } = useRegistrationStore();
 
   const pickImage = async () => {
-    const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 0.7 });
+    const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaType.Images, quality: 0.7 });
     if (!res.canceled) setField('govIdUri', res.assets[0].uri);
   };
 
