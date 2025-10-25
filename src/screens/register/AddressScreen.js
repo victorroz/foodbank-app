@@ -31,11 +31,26 @@ export default function AddressScreen({ navigation }) {
         setLocationOk(false);
         return;
       }
-      const position = await Location.getCurrentPositionAsync({ accuracy: Location.LocationAccuracy.Balanced });
+      const servicesEnabled = await Location.hasServicesEnabledAsync();
+      if (!servicesEnabled) {
+        Alert.alert('Location disabled', 'Enable Location Services in system settings and try again.');
+        setLocationOk(false);
+        return;
+      }
+      const position = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+        timeout: 15000,
+        maximumAge: 10000
+      });
       const { latitude, longitude } = position.coords;
       setCoords({ latitude, longitude });
-      const places = await Location.reverseGeocodeAsync({ latitude, longitude });
-      const place = places?.[0];
+      let place = null;
+      try {
+        const places = await Location.reverseGeocodeAsync({ latitude, longitude });
+        place = places?.[0] ?? null;
+      } catch (geocodeErr) {
+        console.warn('Reverse geocoding failed', geocodeErr);
+      }
       const iso = place?.isoCountryCode;
       const city = place?.city || place?.subregion || '';
       const region = place?.region || '';
@@ -46,9 +61,13 @@ export default function AddressScreen({ navigation }) {
       const inCity = city?.toLowerCase() === serviceRules.city.toLowerCase();
       const inRegion = region?.toLowerCase() === serviceRules.region.toLowerCase();
 
-      if (!inCountry || !inCity || !inRegion) {
+      if (!place || !inCountry || !inCity || !inRegion) {
         setLocationOk(false);
-        Alert.alert('Out of service area', `This app currently serves ${serviceRules.city}, ${serviceRules.region}, ${serviceRules.countryIso} only.`);
+        if (!place) {
+          Alert.alert('Address lookup failed', 'We found your GPS position but could not derive your address. Please enter it manually.');
+        } else {
+          Alert.alert('Out of service area', `This app currently serves ${serviceRules.city}, ${serviceRules.region}, ${serviceRules.countryIso} only.`);
+        }
       } else {
         setLocationOk(true);
       }
