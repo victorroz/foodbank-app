@@ -1,29 +1,24 @@
 {
   "expo": {
-    "name": "foodbank-app",
+    "name": "FoodBank",
     "slug": "foodbank-app",
-    "version": "1.0.0",
+    "scheme": "foodbank",
+    "platforms": ["ios", "android", "web"],
     "orientation": "portrait",
+    "splash": { "image": "./assets/splash.png", "resizeMode": "contain", "backgroundColor": "#ffffff" },
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSCameraUsageDescription": "We need camera access to capture your ID and selfie for verification.",
+        "NSPhotoLibraryAddUsageDescription": "We use the photo library to upload ID images.",
+        "NSLocationWhenInUseUsageDescription": "We use your location to autofill city and validate local eligibility."
+      }
     },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
+    "android": { "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "ACCESS_FINE_LOCATION"] },
+    "extra": {
+      "API_BASE_URL": "http://localhost:4000",
+      "MOCK_MODE": true
     }
   }
 }
