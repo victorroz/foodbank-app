@@ -1,7 +1,12 @@
 import axios from 'axios';
 import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 
-const baseURL = Constants.expoConfig?.extra?.API_BASE_URL || 'http://localhost:4000';
+// Ensure Android emulator can reach local dev server (10.0.2.2)
+const configuredBase = Constants.expoConfig?.extra?.API_BASE_URL || 'http://localhost:4000';
+const baseURL = configuredBase.includes('localhost') && Platform.OS === 'android'
+  ? configuredBase.replace('localhost', '10.0.2.2')
+  : configuredBase;
 const MOCK = Boolean(
   Constants.expoConfig?.extra?.MOCK_MODE === true ||
   Constants.expoConfig?.extra?.MOCK_MODE === 'true'
